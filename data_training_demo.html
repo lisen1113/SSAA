@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Surface数字员工系统 - 数据训练演示</title>
+    <!-- Tailwind CSS v3 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0078D4',
+                        'primary-dark': '#0063B1',
+                        success: '#107C10',
+                        warning: '#FFB900',
+                        error: '#D83B01',
+                        'gray-50': '#F9FAFB',
+                        'gray-100': '#F3F4F6',
+                        'gray-200': '#E5E7EB',
+                        'gray-300': '#D1D5DB',
+                        'gray-400': '#9CA3AF',
+                        'gray-500': '#6B7280',
+                        'gray-600': '#4B5563',
+                        'gray-700': '#374151',
+                        'gray-800': '#1F2937',
+                        'gray-900': '#111827',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'card': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                        'card-hover': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+                    },
+                    transitionProperty: {
+                        'all-300': 'all 300ms ease-in-out',
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .bg-gradient-blue {
+                background: linear-gradient(135deg, #0078D4 0%, #0063B1 100%);
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+            .animate-pulse-slow {
+                animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+            }
+            @keyframes pulse {
+                0%, 100% {
+                    opacity: 1;
+                }
+                50% {
+                    opacity: 0.7;
+                }
+            }
+            .animate-progress {
+                animation: progress 2s ease-out forwards;
+            }
+            @keyframes progress {
+                from {
+                    width: 0%;
+                }
+                to {
+                    width: var(--progress-width);
+                }
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+    <!-- 顶部导航栏 -->
+    <nav class="bg-white shadow-md border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <i class="fa fa-tablet text-primary text-2xl mr-2"></i>
+                        <span class="text-xl font-bold text-gray-900">Surface数字员工系统</span>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors">
+                        <i class="fa fa-arrow-left mr-2"></i> 返回系统
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要内容区域 -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- 页面标题 -->
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">数据训练演示</h1>
+            <p class="text-xl text-gray-600">学习如何为Surface数字员工系统提供训练数据</p>
+        </div>
+
+        <!-- 步骤导航 -->
+        <div class="flex justify-center mb-12">
+            <div class="flex items-center space-x-8">
+                <div class="text-center">
+                    <div class="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center mx-auto mb-2">
+                        <i class="fa fa-file-text-o text-xl"></i>
+                    </div>
+                    <p class="text-sm font-medium text-gray-700">准备数据</p>
+                </div>
+                <div class="h-1 w-8 bg-gray-300"></div>
+                <div class="text-center">
+                    <div class="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center mx-auto mb-2">
+                        <i class="fa fa-upload text-xl"></i>
+                    </div>
+                    <p class="text-sm font-medium text-gray-700">导入数据</p>
+                </div>
+                <div class="h-1 w-8 bg-gray-300"></div>
+                <div class="text-center">
+                    <div class="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center mx-auto mb-2">
+                        <i class="fa fa-cogs text-xl"></i>
+                    </div>
+                    <p class="text-sm font-medium text-gray-700">数据训练</p>
+                </div>
+                <div class="h-1 w-8 bg-gray-300"></div>
+                <div class="text-center">
+                    <div class="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center mx-auto mb-2">
+                        <i class="fa fa-line-chart text-xl"></i>
+                    </div>
+                    <p class="text-sm font-medium text-gray-700">查看结果</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 步骤1：准备数据 -->
+        <div class="bg-white rounded-xl shadow-card p-8 mb-12">
+            <div class="flex items-center mb-6">
+                <div class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center mr-4">
+                    <span class="font-bold">1</span>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-900">准备数据</h2>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">数据格式要求</h3>
+                    <div class="space-y-4">
+                        <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                            <h4 class="font-medium text-gray-800 mb-2">销售数据格式</h4>
+                            <ul class="list-disc list-inside text-gray-600 space-y-1">
+                                <li>产品名称：Surface产品型号</li>
+                                <li>产品型号：详细配置信息</li>
+                                <li>销售数量：数字格式</li>
+                                <li>销售额：数字格式</li>
+                                <li>销售渠道：EC/DMP/SR</li>
+                                <li>区域：华东/华北/华南等</li>
+                                <li>销售日期：YYYY-MM-DD格式</li>
+                                <li>客户名称：公司名称</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                            <h4 class="font-medium text-gray-800 mb-2">客户数据格式</h4>
+                            <ul class="list-disc list-inside text-gray-600 space-y-1">
+                                <li>客户名称：公司全称</li>
+                                <li>联系人：负责人姓名</li>
+                                <li>联系电话：手机号码</li>
+                                <li>邮箱：企业邮箱</li>
+                                <li>所属行业：行业分类</li>
+                                <li>客户状态：活跃/潜在/流失</li>
+                                <li>销售渠道：EC/DMP/SR</li>
+                                <li>客户价值：数字格式</li>
+                                <li>最近交易日期：YYYY-MM-DD格式</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">示例数据文件</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center p-4 bg-blue-50 rounded-lg border border-blue-200">
+                            <i class="fa fa-file-excel-o text-primary text-2xl mr-4"></i>
+                            <div>
+                                <p class="font-medium text-gray-800">销售数据样本</p>
+                                <p class="text-sm text-gray-600">CSV格式，包含14条销售记录</p>
+                            </div>
+                            <a href="data_samples/sales_data_sample.csv" download class="ml-auto px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors">
+                                <i class="fa fa-download mr-2"></i> 下载
+                            </a>
+                        </div>
+                        
+                        <div class="flex items-center p-4 bg-green-50 rounded-lg border border-green-200">
+                            <i class="fa fa-file-excel-o text-success text-2xl mr-4"></i>
+                            <div>
+                                <p class="font-medium text-gray-800">客户数据样本</p>
+                                <p class="text-sm text-gray-600">CSV格式，包含13条客户记录</p>
+                            </div>
+                            <a href="data_samples/customer_data_sample.csv" download class="ml-auto px-4 py-2 bg-success text-white rounded-lg hover:bg-green-700 transition-colors">
+                                <i class="fa fa-download mr-2"></i> 下载
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 步骤2：导入数据 -->
+        <div class="bg-white rounded-xl shadow-card p-8 mb-12">
+            <div class="flex items-center mb-6">
+                <div class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center mr-4">
+                    <span class="font-bold">2</span>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-900">导入数据</h2>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">数据导入流程</h3>
+                    <div class="space-y-6">
+                        <div class="flex">
+                            <div class="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 text-primary flex items-center justify-center mr-4">
+                                <span class="font-medium">1</span>
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-gray-800 mb-1">登录系统</h4>
+                                <p class="text-gray-600">使用您的账号密码登录Surface数字员工系统</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex">
+                            <div class="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 text-primary flex items-center justify-center mr-4">
+                                <span class="font-medium">2</span>
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-gray-800 mb-1">进入数据管理</h4>
+                                <p class="text-gray-600">点击左侧导航栏的"销售数据统计"或"客户管理"</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex">
+                            <div class="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 text-primary flex items-center justify-center mr-4">
+                                <span class="font-medium">3</span>
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-gray-800 mb-1">点击导入按钮</h4>
+                                <p class="text-gray-600">在页面顶部找到并点击"导入数据"按钮</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex">
+                            <div class="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 text-primary flex items-center justify-center mr-4">
+                                <span class="font-medium">4</span>
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-gray-800 mb-1">选择文件</h4>
+                                <p class="text-gray-600">选择准备好的CSV或Excel文件</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex">
+                            <div class="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 text-primary flex items-center justify-center mr-4">
+                                <span class="font-medium">5</span>
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-gray-800 mb-1">确认导入</h4>
+                                <p class="text-gray-600">预览数据无误后，点击"确认导入"按钮</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">交互式演示</h3>
+                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                        <i class="fa fa-cloud-upload text-5xl text-gray-400 mb-4"></i>
+                        <h4 class="text-lg font-medium text-gray-800 mb-2">拖放文件到此处</h4>
+                        <p class="text-gray-600 mb-6">或点击下方按钮选择文件</p>
+                        
+                        <div class="mb-6">
+                            <label for="file-upload" class="px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors cursor-pointer">
+                                <i class="fa fa-folder-open mr-2"></i> 选择文件
+                            </label>
+                            <input id="file-upload" type="file" accept=".csv,.xlsx,.xls" class="hidden">
+                        </div>
+                        
+                        <div class="text-sm text-gray-500">
+                            支持的格式：CSV, Excel (.xlsx, .xls)<br>
+                            文件大小限制：10MB
+                        </div>
+                    </div>
+
+                    <div class="mt-6">
+                        <h4 class="font-medium text-gray-800 mb-3">导入设置</h4>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">数据类型</label>
+                                <select class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                    <option>销售数据</option>
+                                    <option>客户数据</option>
+                                    <option>产品数据</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">导入模式</label>
+                                <select class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                    <option>新增数据</option>
+                                    <option>覆盖现有数据</option>
+                                    <option>更新匹配数据</option>
+                                </select>
+                            </div>
+                            
+                            <div class="flex items-center">
+                                <input type="checkbox" id="skip-duplicates" class="w-4 h-4 text-primary focus:ring-primary border-gray-300 rounded">
+                                <label for="skip-duplicates" class="ml-2 text-sm text-gray-700">跳过重复数据</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 步骤3：数据训练 -->
+        <div class="bg-white rounded-xl shadow-card p-8 mb-12">
+            <div class="flex items-center mb-6">
+                <div class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center mr-4">
+                    <span class="font-bold">3</span>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-900">数据训练</h2>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">训练过程</h3>
+                    <div class="space-y-6">
+                        <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                            <h4 class="font-medium text-gray-800 mb-3">数据预处理</h4>
+                            <div class="space-y-3">
+                                <div class="flex items-center">
+                                    <div class="w-2 h-2 rounded-full bg-success mr-2"></div>
+                                    <span class="text-gray-600">数据清洗和格式标准化</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <div class="w-2 h-2 rounded-full bg-success mr-2"></div>
+                                    <span class="text-gray-600">缺失值处理和异常值检测</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <div class="w-2 h-2 rounded-full bg-success mr-2"></div>
+                                    <span class="text-gray-600">数据分类和标签生成</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                            <h4 class="font-medium text-gray-800 mb-3">模型训练</h4>
+                            <div class="space-y-3">
+                                <div class="flex items-center">
+                                    <div class="w-2 h-2 rounded-full bg-success mr-2"></div>
+                                    <span class="text-gray-600">销售预测模型训练</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <div class="w-2 h-2 rounded-full bg-success mr-2"></div>
+                                    <span class="text-gray-600">客户分类模型训练</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <div class="w-2 h-2 rounded-full bg-success mr-2"></div>
+                                    <span class="text-gray-600">产品推荐模型训练</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                            <h4 class="font-medium text-gray-800 mb-3">模型评估</h4>
+                            <div class="space-y-3">
+                                <div class="flex items-center">
+                                    <div class="w-2 h-2 rounded-full bg-success mr-2"></div>
+                                    <span class="text-gray-600">准确率和精确率评估</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <div class="w-2 h-2 rounded-full bg-success mr-2"></div>
+                                    <span class="text-gray-600">模型优化和参数调整</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <div class="w-2 h-2 rounded-full bg-success mr-2"></div>
+                                    <span class="text-gray-600">模型部署和更新</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">训练进度演示</h3>
+                    <div class="space-y-6">
+                        <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-medium text-gray-800">数据预处理</span>
+                                <span class="text-sm text-gray-600">100%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                <div class="bg-success h-2.5 rounded-full" style="width: 100%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-medium text-gray-800">特征提取</span>
+                                <span class="text-sm text-gray-600">85%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                <div class="bg-primary h-2.5 rounded-full animate-progress" style="--progress-width: 85%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-medium text-gray-800">模型训练</span>
+                                <span class="text-sm text-gray-600">60%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                <div class="bg-primary h-2.5 rounded-full animate-progress" style="--progress-width: 60%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-medium text-gray-800">模型评估</span>
+                                <span class="text-sm text-gray-600">30%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                <div class="bg-primary h-2.5 rounded-full animate-progress" style="--progress-width: 30%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-medium text-gray-800">模型部署</span>
+                                <span class="text-sm text-gray-600">0%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                <div class="bg-gray-400 h-2.5 rounded-full"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-8 text-center">
+                            <button class="px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors">
+                                <i class="fa fa-play mr-2"></i> 继续训练
+                            </button>
+                            <button class="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors ml-4">
+                                <i class="fa fa-pause mr-2"></i> 暂停
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 步骤4：查看结果 -->
+        <div class="bg-white rounded-xl shadow-card p-8 mb-12">
+            <div class="flex items-center mb-6">
+                <div class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center mr-4">
+                    <span class="font-bold">4</span>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-900">查看结果</h2>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">训练结果</h3>
+                    <div class="space-y-6">
+                        <div class="bg-green-50 p-4 rounded-lg border border-green-200">
+                            <div class="flex items-center justify-between mb-3">
+                                <h4 class="font-medium text-gray-800">销售预测模型</h4>
+                                <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">准确率: 92%</span>
+                            </div>
+                            <p class="text-gray-600 mb-3">能够准确预测未来销售趋势，支持按产品、区域、渠道进行预测分析。</p>
+                            <div class="h-40">
+                                <canvas id="salesPredictionChart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                            <div class="flex items-center justify-between mb-3">
+                                <h4 class="font-medium text-gray-800">客户分类模型</h4>
+                                <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">准确率: 88%</span>
+                            </div>
+                            <p class="text-gray-600 mb-3">自动对客户进行分类，识别高价值客户和潜在流失客户。</p>
+                            <div class="h-40">
+                                <canvas id="customerClassificationChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">业务应用</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-start p-4 bg-gray-50 rounded-lg border border-gray-200">
+                            <div class="flex-shrink-0 w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center mr-4">
+                                <i class="fa fa-line-chart"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-gray-800 mb-1">销售预测</h4>
+                                <p class="text-gray-600 text-sm">基于历史数据预测未来销售趋势，帮助制定销售策略和库存计划。</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start p-4 bg-gray-50 rounded-lg border border-gray-200">
+                            <div class="flex-shrink-0 w-10 h-10 rounded-full bg-success text-white flex items-center justify-center mr-4">
+                                <i class="fa fa-users"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-gray-800 mb-1">客户洞察</h4>
+                                <p class="text-gray-600 text-sm">深入了解客户需求和购买行为，提供个性化的产品推荐和服务。</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start p-4 bg-gray-50 rounded-lg border border-gray-200">
+                            <div class="flex-shrink-0 w-10 h-10 rounded-full bg-warning text-white flex items-center justify-center mr-4">
+                                <i class="fa fa-lightbulb-o"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-gray-800 mb-1">智能推荐</h4>
+                                <p class="text-gray-600 text-sm">根据客户历史购买记录和偏好，智能推荐适合的Surface产品和解决方案。</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start p-4 bg-gray-50 rounded-lg border border-gray-200">
+                            <div class="flex-shrink-0 w-10 h-10 rounded-full bg-error text-white flex items-center justify-center mr-4">
+                                <i class="fa fa-exclamation-triangle"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-gray-800 mb-1">风险预警</h4>
+                                <p class="text-gray-600 text-sm">识别潜在的客户流失风险，及时采取措施挽回客户。</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start p-4 bg-gray-50 rounded-lg border border-gray-200">
+                            <div class="flex-shrink-0 w-10 h-10 rounded-full bg-purple-600 text-white flex items-center justify-center mr-4">
+                                <i class="fa fa-cogs"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-gray-800 mb-1">流程优化</h4>
+                                <p class="text-gray-600 text-sm">分析销售流程中的瓶颈，提供优化建议，提高销售效率。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 最佳实践 -->
+        <div class="bg-white rounded-xl shadow-card p-8 mb-12">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">数据训练最佳实践</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="p-6 bg-blue-50 rounded-lg border border-blue-200">
+                    <div class="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center mb-4">
+                        <i class="fa fa-database text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3">数据质量</h3>
+                    <ul class="list-disc list-inside text-gray-600 space-y-2">
+                        <li>确保数据完整性和准确性</li>
+                        <li>定期清洗和更新数据</li>
+                        <li>统一数据格式和标准</li>
+                        <li>处理缺失值和异常值</li>
+                    </ul>
+                </div>
+                
+                <div class="p-6 bg-green-50 rounded-lg border border-green-200">
+                    <div class="w-12 h-12 rounded-full bg-success text-white flex items-center justify-center mb-4">
+                        <i class="fa fa-calendar text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3">定期更新</h3>
+                    <ul class="list-disc list-inside text-gray-600 space-y-2">
+                        <li>建立数据定期更新机制</li>
+                        <li>每月至少更新一次销售数据</li>
+                        <li>季度更新客户信息</li>
+                        <li>及时更新产品信息和价格</li>
+                    </ul>
+                </div>
+                
+                <div class="p-6 bg-yellow-50 rounded-lg border border-yellow-200">
+                    <div class="w-12 h-12 rounded-full bg-warning text-white flex items-center justify-center mb-4">
+                        <i class="fa fa-bar-chart text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3">持续优化</h3>
+                    <ul class="list-disc list-inside text-gray-600 space-y-2">
+                        <li>监控模型预测准确率</li>
+                        <li>根据业务反馈调整模型</li>
+                        <li>引入新的数据源</li>
+                        <li>优化特征工程</li>
+                    </ul>
+                </div>
+                
+                <div class="p-6 bg-red-50 rounded-lg border border-red-200">
+                    <div class="w-12 h-12 rounded-full bg-error text-white flex items-center justify-center mb-4">
+                        <i class="fa fa-shield text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3">数据安全</h3>
+                    <ul class="list-disc list-inside text-gray-600 space-y-2">
+                        <li>保护敏感客户信息</li>
+                        <li>数据脱敏处理</li>
+                        <li>访问权限控制</li>
+                        <li>定期备份数据</li>
+                    </ul>
+                </div>
+                
+                <div class="p-6 bg-purple-50 rounded-lg border border-purple-200">
+                    <div class="w-12 h-12 rounded-full bg-purple-600 text-white flex items-center justify-center mb-4">
+                        <i class="fa fa-users text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3">团队协作</h3>
+                    <ul class="list-disc list-inside text-gray-600 space-y-2">
+                        <li>销售团队提供业务反馈</li>
+                        <li>IT团队负责技术支持</li>
+                        <li>定期召开数据评审会议</li>
+                        <li>建立数据质量考核机制</li>
+                    </ul>
+                </div>
+                
+                <div class="p-6 bg-gray-50 rounded-lg border border-gray-200">
+                    <div class="w-12 h-12 rounded-full bg-gray-600 text-white flex items-center justify-center mb-4">
+                        <i class="fa fa-lightbulb-o text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3">业务应用</h3>
+                    <ul class="list-disc list-inside text-gray-600 space-y-2">
+                        <li>将预测结果应用到实际业务</li>
+                        <li>根据客户分类制定营销策略</li>
+                        <li>优化库存管理和供应链</li>
+                        <li>评估销售目标完成情况</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 开始使用 -->
+        <div class="bg-gradient-blue rounded-xl shadow-lg p-8 text-center text-white">
+            <h2 class="text-3xl font-bold mb-4 text-shadow">准备好开始数据训练了吗？</h2>
+            <p class="text-xl mb-8 max-w-3xl mx-auto">按照上述步骤准备您的数据，开始使用Surface数字员工系统进行智能销售分析和预测。</p>
+            <div class="flex justify-center space-x-6">
+                <a href="index.html" class="px-8 py-3 bg-white text-primary font-medium rounded-lg hover:bg-gray-100 transition-colors">
+                    <i class="fa fa-arrow-left mr-2"></i> 返回系统
+                </a>
+                <button class="px-8 py-3 bg-success text-white font-medium rounded-lg hover:bg-green-700 transition-colors">
+                    <i class="fa fa-play mr-2"></i> 开始训练
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0">
+                    <div class="flex items-center">
+                        <i class="fa fa-tablet text-primary text-2xl mr-2"></i>
+                        <span class="text-xl font-bold">Surface数字员工系统</span>
+                    </div>
+                    <p class="text-gray-400 mt-1">提升销售效率，赋能业务增长</p>
+                </div>
+                <div class="flex space-x-6">
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                        <i class="fa fa-question-circle mr-1"></i> 帮助中心
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                        <i class="fa fa-book mr-1"></i> 使用文档
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                        <i class="fa fa-envelope mr-1"></i> 联系我们
+                    </a>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-6 pt-6 text-center text-gray-400 text-sm">
+                © 2025 Microsoft Corporation. 保留所有权利。
+            </div>
+        </div>
+    </footer>
+
+    <!-- 图表初始化 -->
+    <script>
+        // 销售预测图表
+        const salesPredictionCtx = document.getElementById('salesPredictionChart');
+        if (salesPredictionCtx) {
+            new Chart(salesPredictionCtx, {
+                type: 'line',
+                data: {
+                    labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
+                    datasets: [{
+                        label: '实际销售',
+                        data: [85000, 92000, 78000, 95000, 110000, 105000],
+                        borderColor: '#0078D4',
+                        backgroundColor: 'rgba(0, 120, 212, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: '预测销售',
+                        data: [null, null, null, null, null, 105000, 120000, 132000, 125000, 140000],
+                        borderColor: '#107C10',
+                        borderDash: [5, 5],
+                        tension: 0.4,
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // 客户分类图表
+        const customerClassificationCtx = document.getElementById('customerClassificationChart');
+        if (customerClassificationCtx) {
+            new Chart(customerClassificationCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['高价值客户', '中价值客户', '低价值客户', '潜在客户', '流失风险客户'],
+                    datasets: [{
+                        data: [25, 35, 20, 15, 5],
+                        backgroundColor: ['#0078D4', '#107C10', '#FFB900', '#5C2D91', '#D83B01']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                boxWidth: 12,
+                                font: {
+                                    size: 10
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
