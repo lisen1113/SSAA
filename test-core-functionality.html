@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI助手核心功能测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .test-result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0069d9;
+        }
+    </style>
+</head>
+<body>
+    <h1>AI助手核心功能测试</h1>
+    
+    <div class="test-section">
+        <h2>1. 函数存在性测试</h2>
+        <button onclick="testFunctions()">测试函数存在性</button>
+        <div id="function-test-result" class="test-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. 响应生成测试</h2>
+        <input type="text" id="test-message" placeholder="输入测试消息..." value="你好">
+        <button onclick="testResponse()">测试响应生成</button>
+        <div id="response-test-result" class="test-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. 事件监听器测试</h2>
+        <button onclick="testEventListeners()">测试事件监听器</button>
+        <div id="event-test-result" class="test-result"></div>
+    </div>
+
+    <script src="enhanced-ai-assistant.js"></script>
+    <script>
+        function testFunctions() {
+            const resultDiv = document.getElementById('function-test-result');
+            let html = '';
+            
+            // 测试核心函数
+            const functionsToTest = [
+                'getAIResponse',
+                'getEnhancedLocalResponse',
+                'getLocalAIResponse',
+                'addMessage',
+                'addLoadingMessage',
+                'removeLoadingMessage'
+            ];
+            
+            functionsToTest.forEach(funcName => {
+                if (typeof window[funcName] === 'function') {
+                    html += `<p class="success">✓ ${funcName} 函数存在</p>`;
+                } else {
+                    html += `<p class="error">✗ ${funcName} 函数不存在</p>`;
+                }
+            });
+            
+            resultDiv.innerHTML = html;
+        }
+        
+        function testResponse() {
+            const message = document.getElementById('test-message').value;
+            const resultDiv = document.getElementById('response-test-result');
+            
+            if (typeof window.getAIResponse === 'function') {
+                window.getAIResponse(message).then(response => {
+                    resultDiv.innerHTML = `<p class="success">✓ 响应生成成功</p><p>输入: ${message}</p><p>响应: ${response}</p>`;
+                }).catch(error => {
+                    resultDiv.innerHTML = `<p class="error">✗ 响应生成失败: ${error.message}</p>`;
+                });
+            } else {
+                resultDiv.innerHTML = `<p class="error">✗ getAIResponse 函数不存在</p>`;
+            }
+        }
+        
+        function testEventListeners() {
+            const resultDiv = document.getElementById('event-test-result');
+            
+            // 检查DOM元素是否存在
+            const elementsToCheck = [
+                'ai-chat-form',
+                'ai-message-input',
+                'ai-chat-container'
+            ];
+            
+            let html = '';
+            elementsToCheck.forEach(elementId => {
+                const element = document.getElementById(elementId);
+                if (element) {
+                    html += `<p class="success">✓ ${elementId} 元素存在</p>`;
+                } else {
+                    html += `<p class="error">✗ ${elementId} 元素不存在</p>`;
+                }
+            });
+            
+            resultDiv.innerHTML = html;
+        }
+        
+        // 页面加载完成后自动测试
+        window.onload = function() {
+            console.log('页面加载完成，开始测试...');
+            testFunctions();
+        };
+    </script>
+</body>
+</html>

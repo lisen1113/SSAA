@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>麦克风测试</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center justify-center p-4">
+    <div class="bg-white rounded-lg shadow-lg p-6 max-w-md w-full">
+        <h1 class="text-2xl font-bold text-center mb-6 text-gray-800">麦克风测试</h1>
+        
+        <div class="space-y-4">
+            <!-- 麦克风权限测试 -->
+            <div class="p-4 border rounded-lg">
+                <h2 class="text-lg font-semibold mb-2">麦克风权限</h2>
+                <button id="test-mic-permission" class="w-full py-2 bg-primary text-white rounded-md hover:bg-primary-dark">
+                    测试麦克风权限
+                </button>
+                <div id="mic-permission-result" class="mt-2 text-sm p-2 rounded bg-gray-50 min-h-[40px]"></div>
+            </div>
+            
+            <!-- 语音输入测试 -->
+            <div class="p-4 border rounded-lg">
+                <h2 class="text-lg font-semibold mb-2">语音输入测试</h2>
+                <button id="start-voice-input" class="w-full py-2 bg-primary text-white rounded-md hover:bg-primary-dark">
+                    <i class="fa fa-microphone mr-2"></i> 开始语音输入
+                </button>
+                <input type="text" id="voice-input-result" class="mt-2 w-full p-2 border rounded" placeholder="语音识别结果将显示在这里">
+                <div id="voice-input-status" class="mt-2 text-sm text-gray-600"></div>
+            </div>
+            
+            <!-- 语音输出测试 -->
+            <div class="p-4 border rounded-lg">
+                <h2 class="text-lg font-semibold mb-2">语音输出测试</h2>
+                <input type="text" id="text-to-speak" class="w-full p-2 border rounded mb-2" value="你好，这是一个语音输出测试">
+                <button id="start-text-to-speech" class="w-full py-2 bg-primary text-white rounded-md hover:bg-primary-dark">
+                    <i class="fa fa-volume-up mr-2"></i> 开始语音朗读
+                </button>
+                <div id="text-to-speech-status" class="mt-2 text-sm text-gray-600"></div>
+            </div>
+            
+            <!-- 浏览器兼容性测试 -->
+            <div class="p-4 border rounded-lg">
+                <h2 class="text-lg font-semibold mb-2">浏览器兼容性</h2>
+                <div id="browser-compatibility" class="space-y-2 text-sm"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 测试麦克风权限
+        document.getElementById('test-mic-permission').addEventListener('click', async function() {
+            const resultDiv = document.getElementById('mic-permission-result');
+            resultDiv.textContent = '正在检查麦克风权限...';
+            
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                resultDiv.textContent = '✅ 麦克风权限已授予';
+                resultDiv.className = 'mt-2 text-sm p-2 rounded bg-green-50 min-h-[40px]';
+                stream.getTracks().forEach(track => track.stop());
+            } catch (error) {
+                resultDiv.textContent = `❌ 麦克风权限被拒绝: ${error.message}`;
+                resultDiv.className = 'mt-2 text-sm p-2 rounded bg-red-50 min-h-[40px]';
+            }
+        });
+        
+        // 测试语音输入
+        document.getElementById('start-voice-input').addEventListener('click', function() {
+            const statusDiv = document.getElementById('voice-input-status');
+            const resultInput = document.getElementById('voice-input-result');
+            
+            statusDiv.textContent = '准备开始语音输入...';
+            
+            if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                const recognition = new SpeechRecognition();
+                
+                recognition.lang = 'zh-CN';
+                recognition.continuous = false;
+                recognition.interimResults = false;
+                
+                recognition.onstart = function() {
+                    statusDiv.textContent = '正在聆听...';
+                    statusDiv.className = 'mt-2 text-sm text-blue-600';
+                };
+                
+                recognition.onresult = function(event) {
+                    const transcript = event.results[0][0].transcript;
+                    resultInput.value = transcript;
+                    statusDiv.textContent = '语音识别完成';
+                    statusDiv.className = 'mt-2 text-sm text-green-600';
+                };
+                
+                recognition.onerror = function(event) {
+                    statusDiv.textContent = `错误: ${event.error}`;
+                    statusDiv.className = 'mt-2 text-sm text-red-600';
+                };
+                
+                recognition.onend = function() {
+                    if (!statusDiv.textContent.includes('完成') && !statusDiv.textContent.includes('错误')) {
+                        statusDiv.textContent = '语音输入已结束';
+                    }
+                };
+                
+                recognition.start();
+            } else {
+                statusDiv.textContent = '您的浏览器不支持语音识别';
+                statusDiv.className = 'mt-2 text-sm text-red-600';
+            }
+        });
+        
+        // 测试语音输出
+        document.getElementById('start-text-to-speech').addEventListener('click', function() {
+            const text = document.getElementById('text-to-speak').value;
+            const statusDiv = document.getElementById('text-to-speech-status');
+            
+            statusDiv.textContent = '准备开始语音朗读...';
+            
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'zh-CN';
+                utterance.rate = 0.9;
+                utterance.pitch = 1.1;
+                utterance.volume = 1.0;
+                
+                utterance.onstart = function() {
+                    statusDiv.textContent = '正在朗读...';
+                    statusDiv.className = 'mt-2 text-sm text-blue-600';
+                };
+                
+                utterance.onend = function() {
+                    statusDiv.textContent = '语音朗读完成';
+                    statusDiv.className = 'mt-2 text-sm text-green-600';
+                };
+                
+                utterance.onerror = function(event) {
+                    statusDiv.textContent = `错误: ${event.error}`;
+                    statusDiv.className = 'mt-2 text-sm text-red-600';
+                };
+                
+                speechSynthesis.speak(utterance);
+            } else {
+                statusDiv.textContent = '您的浏览器不支持语音合成';
+                statusDiv.className = 'mt-2 text-sm text-red-600';
+            }
+        });
+        
+        // 测试浏览器兼容性
+        function testBrowserCompatibility() {
+            const compatibilityDiv = document.getElementById('browser-compatibility');
+            
+            const tests = [
+                {
+                    name: 'SpeechRecognition API',
+                    test: 'SpeechRecognition' in window || 'webkitSpeechRecognition' in window
+                },
+                {
+                    name: 'speechSynthesis API',
+                    test: 'speechSynthesis' in window
+                },
+                {
+                    name: 'getUserMedia API',
+                    test: 'mediaDevices' in navigator && 'getUserMedia' in navigator.mediaDevices
+                },
+                {
+                    name: 'AudioContext API',
+                    test: 'AudioContext' in window || 'webkitAudioContext' in window
+                }
+            ];
+            
+            tests.forEach(test => {
+                const testDiv = document.createElement('div');
+                testDiv.textContent = `${test.name}: ${test.test ? '✅ 支持' : '❌ 不支持'}`;
+                testDiv.className = test.test ? 'text-green-600' : 'text-red-600';
+                compatibilityDiv.appendChild(testDiv);
+            });
+        }
+        
+        // 页面加载时测试浏览器兼容性
+        window.addEventListener('load', testBrowserCompatibility);
+    </script>
+</body>
+</html>

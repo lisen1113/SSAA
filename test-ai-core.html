@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI助手核心功能测试</title>
+    <!-- Tailwind CSS v3 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- 增强AI智能体功能 -->
+    <script src="enhanced-ai-assistant.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        .test-result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .test-pass {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .test-fail {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        #ai-assistant-modal {
+            display: block !important;
+            position: relative;
+            background: none;
+            max-width: 100%;
+            max-height: none;
+        }
+        #ai-assistant-modal > div {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>AI助手核心功能测试</h1>
+    
+    <div class="test-section">
+        <h2>1. 函数存在性测试</h2>
+        <button onclick="testFunctionExistence()" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">运行测试</button>
+        <div id="function-test-result" class="test-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. 本地响应测试</h2>
+        <input type="text" id="test-message" placeholder="输入测试消息" value="你好" class="px-4 py-2 border rounded">
+        <button onclick="testLocalResponse()" class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">测试响应</button>
+        <div id="response-test-result" class="test-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. 模态框测试</h2>
+        <div id="ai-assistant-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+            <div class="bg-white rounded-lg shadow-xl w-full max-w-3xl max-h-[80vh] overflow-hidden flex flex-col">
+                <!-- 模态框头部 -->
+                <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-50">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center mr-3">
+                            <i class="fa fa-robot text-white text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900">Surface AI 智能助手</h3>
+                            <p class="text-sm text-gray-500">智能分析需求，提供专业解决方案</p>
+                        </div>
+                    </div>
+                    <button id="close-ai-assistant" class="text-gray-400 hover:text-gray-600">
+                        <i class="fa fa-times text-xl"></i>
+                    </button>
+                </div>
+                
+                <!-- 对话内容区域 -->
+                <div id="ai-chat-container" class="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+                    <!-- 系统欢迎消息 -->
+                    <div class="flex items-start">
+                        <div class="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center flex-shrink-0 mr-3">
+                            <i class="fa fa-robot text-white"></i>
+                        </div>
+                        <div class="bg-white rounded-lg p-3 shadow-sm max-w-[80%]">
+                            <p class="text-gray-800">您好！我是Surface AI智能助手，很高兴为您服务。请描述您的需求，我将为您提供专业的Surface解决方案建议。</p>
+                            <p class="text-gray-600 text-sm mt-2">例如："我们是一家教育机构，需要为教师配备适合教学的设备，预算在8000元左右"</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 输入区域 -->
+                <div class="p-4 border-t border-gray-200">
+                    <form id="ai-chat-form" class="flex space-x-2">
+                        <input type="text" id="ai-message-input" placeholder="请描述您的需求..." value="你好" class="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        <button type="submit" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+                            <i class="fa fa-paper-plane"></i>
+                        </button>
+                    </form>
+                    <div class="mt-2 text-xs text-gray-500 text-center">
+                        <p>您也可以使用语音输入 <button id="voice-input-btn" class="text-purple-600 hover:underline ml-1"><i class="fa fa-microphone"></i> 开始语音</button></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 测试函数存在性
+        function testFunctionExistence() {
+            const resultDiv = document.getElementById('function-test-result');
+            let results = [];
+            
+            // 测试核心函数
+            const functionsToTest = [
+                'addMessage',
+                'addLoadingMessage',
+                'removeLoadingMessage',
+                'getAIResponse'
+            ];
+            
+            functionsToTest.forEach(funcName => {
+                if (typeof window[funcName] === 'function') {
+                    results.push(`✅ ${funcName} 函数存在`);
+                } else {
+                    results.push(`❌ ${funcName} 函数不存在`);
+                }
+            });
+            
+            // 显示结果
+            resultDiv.innerHTML = results.join('<br>');
+            resultDiv.className = 'test-result test-pass';
+        }
+        
+        // 测试本地响应
+        async function testLocalResponse() {
+            const message = document.getElementById('test-message').value;
+            const resultDiv = document.getElementById('response-test-result');
+            
+            try {
+                resultDiv.innerHTML = '测试中...';
+                const response = await window.getAIResponse(message);
+                resultDiv.innerHTML = `✅ 测试成功！<br>输入: ${message}<br>响应: ${response}`;
+                resultDiv.className = 'test-result test-pass';
+            } catch (error) {
+                resultDiv.innerHTML = `❌ 测试失败！<br>错误: ${error.message}`;
+                resultDiv.className = 'test-result test-fail';
+            }
+        }
+        
+        // 页面加载完成后测试
+        window.addEventListener('load', function() {
+            console.log('页面加载完成，开始测试...');
+            testFunctionExistence();
+        });
+    </script>
+</body>
+</html>

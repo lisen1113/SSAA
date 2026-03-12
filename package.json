@@ -1,0 +1,31 @@
+{
+  "name": "surface-ai-assistant-backend",
+  "version": "1.0.0",
+  "description": "Surface AI Assistant Backend Service",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "start-local": "node local-model-server.js",
+    "dev-local": "nodemon local-model-server.js",
+    "start-all": "concurrently \"npm start\" \"npm run start-local\"",
+    "dev-all": "concurrently \"npm run dev\" \"npm run dev-local\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "surface",
+    "ai",
+    "assistant",
+    "doubao"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2",
+    "concurrently": "^7.6.0"
+  }
+}

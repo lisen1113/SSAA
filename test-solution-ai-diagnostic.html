@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>解决方案智能助手 - 诊断测试</title>
+    <!-- Tailwind CSS v3 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- AI模型接口 -->
+    <script type="module" src="ai-model-interface.js"></script>
+    <!-- 增强AI助手 -->
+    <script src="enhanced-ai-assistant.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+        .test-section {
+            transition: all 0.3s ease;
+        }
+        .test-section:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+        .status-success {
+            background-color: #107C10;
+        }
+        .status-error {
+            background-color: #E81123;
+        }
+        .status-warning {
+            background-color: #FFB900;
+        }
+        .status-info {
+            background-color: #00B7C3;
+        }
+        .chat-message {
+            margin-bottom: 12px;
+            padding: 10px;
+            border-radius: 8px;
+            max-width: 80%;
+        }
+        .user-message {
+            background-color: rgba(0, 120, 212, 0.1);
+            margin-left: auto;
+            border-bottom-right-radius: 2px;
+        }
+        .ai-message {
+            background-color: #f3f2f1;
+            margin-right: auto;
+            border-bottom-left-radius: 2px;
+        }
+        .loading-message {
+            display: flex;
+            align-items: center;
+        }
+        .loading-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #64748b;
+            margin: 0 2px;
+            animation: pulse 1.5s infinite;
+        }
+        .loading-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        .loading-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        @keyframes pulse {
+            0% {
+                transform: scale(0.8);
+                opacity: 0.5;
+            }
+            50% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(0.8);
+                opacity: 0.5;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <header class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-800">解决方案智能助手 - 诊断测试</h1>
+            <p class="text-gray-600 mt-2">系统性诊断与修复解决方案智能助手的关键问题</p>
+        </header>
+
+        <!-- 状态概览 -->
+        <section class="mb-8 bg-white rounded-lg shadow-card p-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">状态概览</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="p-4 border rounded-lg">
+                    <h3 class="text-sm font-medium text-gray-600 mb-2">前端状态</h3>
+                    <p id="frontend-status" class="flex items-center text-sm font-medium">
+                        <span class="status-indicator status-info"></span>
+                        <span>检查中...</span>
+                    </p>
+                </div>
+                <div class="p-4 border rounded-lg">
+                    <h3 class="text-sm font-medium text-gray-600 mb-2">本地模型服务</h3>
+                    <p id="model-server-status" class="flex items-center text-sm font-medium">
+                        <span class="status-indicator status-info"></span>
+                        <span>检查中...</span>
+                    </p>
+                </div>
+                <div class="p-4 border rounded-lg">
+                    <h3 class="text-sm font-medium text-gray-600 mb-2">Ollama 状态</h3>
+                    <p id="ollama-status" class="flex items-center text-sm font-medium">
+                        <span class="status-indicator status-info"></span>
+                        <span>检查中...</span>
+                    </p>
+                </div>
+                <div class="p-4 border rounded-lg">
+                    <h3 class="text-sm font-medium text-gray-600 mb-2">语音功能</h3>
+                    <p id="voice-status" class="flex items-center text-sm font-medium">
+                        <span class="status-indicator status-info"></span>
+                        <span>检查中...</span>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 功能测试 -->
+        <section class="mb-8 bg-white rounded-lg shadow-card p-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">功能测试</h2>
+            
+            <!-- AI助手测试 -->
+            <div class="mb-6">
+                <h3 class="text-lg font-medium text-gray-700 mb-3">AI助手响应测试</h3>
+                <div class="border rounded-lg overflow-hidden">
+                    <div id="chat-container" class="h-80 overflow-y-auto p-4 bg-gray-50">
+                        <div class="chat-message ai-message">
+                            <p>您好！我是解决方案智能助手，很高兴为您服务。请问您需要了解哪方面的Surface产品或解决方案？</p>
+                        </div>
+                    </div>
+                    <div class="p-4 border-t">
+                        <form id="chat-form" class="flex space-x-2">
+                            <input type="text" id="message-input" class="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" placeholder="请输入您的问题...">
+                            <button type="submit" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors">发送</button>
+                            <button type="button" id="voice-input-btn" class="p-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">
+                                <i class="fa fa-microphone"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 模型状态测试 -->
+            <div class="mb-6">
+                <h3 class="text-lg font-medium text-gray-700 mb-3">模型状态测试</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="p-4 border rounded-lg">
+                        <h4 class="text-sm font-medium text-gray-600 mb-2">已安装模型</h4>
+                        <div id="installed-models" class="text-sm text-gray-700">
+                            检查中...
+                        </div>
+                    </div>
+                    <div class="p-4 border rounded-lg">
+                        <h4 class="text-sm font-medium text-gray-600 mb-2">系统资源</h4>
+                        <div id="system-resources" class="text-sm text-gray-700">
+                            检查中...
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 语音功能测试 -->
+            <div class="mb-6">
+                <h3 class="text-lg font-medium text-gray-700 mb-3">语音功能测试</h3>
+                <div class="p-4 border rounded-lg">
+                    <div class="flex items-center space-x-4">
+                        <button id="test-voice-btn" class="px-4 py-2 bg-secondary text-dark rounded-lg hover:bg-secondary-dark transition-colors flex items-center">
+                            <i class="fa fa-microphone mr-2"></i> 测试语音输入
+                        </button>
+                        <div id="voice-status-text" class="text-sm text-gray-600">
+                            点击按钮开始测试语音输入
+                        </div>
+                    </div>
+                    <div id="voice-result" class="mt-4 p-3 bg-gray-50 rounded-lg hidden">
+                        <h4 class="text-sm font-medium text-gray-700 mb-1">语音识别结果：</h4>
+                        <p id="voice-transcript" class="text-sm text-gray-800"></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 诊断报告 -->
+        <section class="mb-8 bg-white rounded-lg shadow-card p-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">诊断报告</h2>
+            <div id="diagnostic-report" class="text-sm text-gray-700">
+                <p>执行诊断测试中...</p>
+            </div>
+        </section>
+
+        <!-- 修复建议 -->
+        <section class="bg-white rounded-lg shadow-card p-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">修复建议</h2>
+            <div id="fix-suggestions" class="text-sm text-gray-700">
+                <p>基于诊断结果生成修复建议...</p>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // 全局变量
+        let recognition = null;
+
+        // 初始化测试
+        async function initializeTests() {
+            console.log('开始初始化测试...');
+            
+            // 检查前端状态
+            await checkFrontendStatus();
+            
+            // 检查本地模型服务状态
+            await checkModelServerStatus();
+            
+            // 检查Ollama状态
+            await checkOllamaStatus();
+            
+            // 检查语音功能
+            checkVoiceStatus();
+            
+            // 生成诊断报告
+            generateDiagnosticReport();
+        }
+
+        // 检查前端状态
+        function checkFrontendStatus() {
+            return new Promise((resolve) => {
+                console.log('检查前端状态...');
+                const frontendStatus = document.getElementById('frontend-status');
+                
+                const checks = {
+                    addMessage: typeof window.addMessage === 'function',
+                    getAIResponse: typeof window.getAIResponse === 'function',
+                    aiModelInterface: typeof window.aiModelInterface === 'object'
+                };
+                
+                console.log('前端状态检查结果:', checks);
+                
+                if (checks.getAIResponse && checks.addMessage) {
+                    frontendStatus.innerHTML = '<span class="status-indicator status-success"></span><span>正常</span>';
+                } else {
+                    frontendStatus.innerHTML = '<span class="status-indicator status-error"></span><span>异常</span>';
+                }
+                
+                resolve(checks);
+            });
+        }
+
+        // 检查本地模型服务状态
+        async function checkModelServerStatus() {
+            console.log('检查本地模型服务状态...');
+            const modelServerStatus = document.getElementById('model-server-status');
+            
+            try {
+                const response = await fetch('http://localhost:3002/api/local/health');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.status === 'ok') {
+                        modelServerStatus.innerHTML = '<span class="status-indicator status-success"></span><span>运行中</span>';
+                    } else {
+                        modelServerStatus.innerHTML = '<span class="status-indicator status-error"></span><span>异常</span>';
+                    }
+                } else {
+                    modelServerStatus.innerHTML = '<span class="status-indicator status-error"></span><span>未运行</span>';
+                }
+            } catch (error) {
+                console.error('检查本地模型服务失败:', error);
+                modelServerStatus.innerHTML = '<span class="status-indicator status-error"></span><span>未运行</span>';
+            }
+        }
+
+        // 检查Ollama状态
+        async function checkOllamaStatus() {
+            console.log('检查Ollama状态...');
+            const ollamaStatus = document.getElementById('ollama-status');
+            
+            try {
+                const response = await fetch('http://localhost:3002/api/local/status');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.ollamaInstalled) {
+                        ollamaStatus.innerHTML = '<span class="status-indicator status-success"></span><span>已安装</span>';
+                        
+                        // 更新已安装模型列表
+                        const installedModels = document.getElementById('installed-models');
+                        if (data.installedModels && data.installedModels.length > 0) {
+                            let modelsHtml = '';
+                            data.installedModels.forEach(model => {
+                                modelsHtml += `<div class="flex items-center justify-between py-1">
+                                    <span>${model.name}</span>
+                                    <span class="text-xs text-gray-500">${model.size}</span>
+                                </div>`;
+                            });
+                            installedModels.innerHTML = modelsHtml;
+                        } else {
+                            installedModels.innerHTML = '<p class="text-gray-500">未安装任何模型</p>';
+                        }
+                        
+                        // 更新系统资源信息
+                        const systemResources = document.getElementById('system-resources');
+                        if (data.systemInfo) {
+                            systemResources.innerHTML = `<pre class="whitespace-pre-wrap">${JSON.stringify(data.systemInfo, null, 2)}</pre>`;
+                        }
+                    } else {
+                        ollamaStatus.innerHTML = '<span class="status-indicator status-error"></span><span>未安装</span>';
+                    }
+                } else {
+                    ollamaStatus.innerHTML = '<span class="status-indicator status-error"></span><span>无法检查</span>';
+                }
+            } catch (error) {
+                console.error('检查Ollama状态失败:', error);
+                ollamaStatus.innerHTML = '<span class="status-indicator status-error"></span><span>无法检查</span>';
+            }
+        }
+
+        // 检查语音功能
+        function checkVoiceStatus() {
+            console.log('检查语音功能...');
+            const voiceStatus = document.getElementById('voice-status');
+            
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                voiceStatus.innerHTML = '<span class="status-indicator status-success"></span><span>支持</span>';
+            } else {
+                voiceStatus.innerHTML = '<span class="status-indicator status-error"></span><span>不支持</span>';
+            }
+        }
+
+        // 生成诊断报告
+        function generateDiagnosticReport() {
+            console.log('生成诊断报告...');
+            const diagnosticReport = document.getElementById('diagnostic-report');
+            const fixSuggestions = document.getElementById('fix-suggestions');
+            
+            let report = '<div class="space-y-2">';
+            let suggestions = '<div class="space-y-2">';
+            
+            // 检查前端状态
+            if (typeof window.getAIResponse === 'function' && typeof window.addMessage === 'function') {
+                report += '<p class="flex items-start">
+                    <span class="status-indicator status-success mt-1"></span>
+                    <span>前端AI助手函数已正确加载</span>
+                </p>';
+            } else {
+                report += '<p class="flex items-start">
+                    <span class="status-indicator status-error mt-1"></span>
+                    <span>前端AI助手函数未正确加载</span>
+                </p>';
+                suggestions += '<p class="flex items-start">
+                    <span class="status-indicator status-warning mt-1"></span>
+                    <span>确保enhanced-ai-assistant.js文件已正确加载，并且核心函数已定义</span>
+                </p>';
+            }
+            
+            // 检查本地模型服务
+            // 这里需要异步检查，暂时跳过
+            
+            // 检查语音功能
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                report += '<p class="flex items-start">
+                    <span class="status-indicator status-success mt-1"></span>
+                    <span>浏览器支持语音识别功能</span>
+                </p>';
+            } else {
+                report += '<p class="flex items-start">
+                    <span class="status-indicator status-error mt-1"></span>
+                    <span>浏览器不支持语音识别功能</span>
+                </p>';
+                suggestions += '<p class="flex items-start">
+                    <span class="status-indicator status-warning mt-1"></span>
+                    <span>建议使用Chrome或Edge浏览器以支持语音识别功能</span>
+                </p>';
+            }
+            
+            report += '</div>';
+            suggestions += '</div>';
+            
+            diagnosticReport.innerHTML = report;
+            fixSuggestions.innerHTML = suggestions;
+        }
+
+        // 处理聊天表单提交
+        document.getElementById('chat-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const messageInput = document.getElementById('message-input');
+            const message = messageInput.value.trim();
+            
+            if (message) {
+                // 添加用户消息
+                addUserMessage(message);
+                messageInput.value = '';
+                
+                // 显示加载状态
+                const loadingId = addLoadingMessage();
+                
+                // 获取AI响应
+                try {
+                    if (typeof window.getAIResponse === 'function') {
+                        console.log('调用getAIResponse获取AI响应...');
+                        const response = await window.getAIResponse(message);
+                        console.log('获取到AI响应:', response);
+                        
+                        // 移除加载状态
+                        removeLoadingMessage(loadingId);
+                        
+                        // 添加AI消息
+                        addAIMessage(response);
+                    } else {
+                        console.error('getAIResponse函数不存在');
+                        removeLoadingMessage(loadingId);
+                        addAIMessage('抱歉，AI服务暂时不可用，请稍后重试。');
+                    }
+                } catch (error) {
+                    console.error('获取AI响应失败:', error);
+                    removeLoadingMessage(loadingId);
+                    addAIMessage('抱歉，AI服务暂时不可用，请稍后重试。');
+                }
+            }
+        });
+
+        // 处理语音输入按钮点击
+        document.getElementById('test-voice-btn').addEventListener('click', function() {
+            const voiceStatusText = document.getElementById('voice-status-text');
+            const voiceResult = document.getElementById('voice-result');
+            const voiceTranscript = document.getElementById('voice-transcript');
+            
+            // 检查浏览器支持
+            if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+                voiceStatusText.textContent = '您的浏览器不支持语音识别功能，请使用Chrome或Edge浏览器';
+                voiceStatusText.className = 'text-sm text-error';
+                return;
+            }
+            
+            try {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                recognition = new SpeechRecognition();
+                
+                // 配置识别参数
+                recognition.lang = 'zh-CN';
+                recognition.continuous = false;
+                recognition.interimResults = false;
+                recognition.maxAlternatives = 1;
+                
+                // 更新按钮状态
+                const voiceBtn = document.getElementById('test-voice-btn');
+                voiceBtn.innerHTML = '<i class="fa fa-microphone-slash mr-2"></i> 正在聆听...';
+                voiceBtn.disabled = true;
+                voiceBtn.className = 'px-4 py-2 bg-gray-400 text-white rounded-lg cursor-not-allowed flex items-center';
+                
+                voiceStatusText.textContent = '正在聆听，请说出您的问题...';
+                voiceStatusText.className = 'text-sm text-primary';
+                
+                // 结果处理
+                recognition.onresult = function(event) {
+                    const transcript = event.results[0][0].transcript;
+                    console.log('语音识别结果:', transcript);
+                    
+                    voiceTranscript.textContent = transcript;
+                    voiceResult.classList.remove('hidden');
+                    
+                    voiceStatusText.textContent = '语音识别完成';
+                    voiceStatusText.className = 'text-sm text-success';
+                    
+                    // 恢复按钮状态
+                    voiceBtn.innerHTML = '<i class="fa fa-microphone mr-2"></i> 测试语音输入';
+                    voiceBtn.disabled = false;
+                    voiceBtn.className = 'px-4 py-2 bg-secondary text-dark rounded-lg hover:bg-secondary-dark transition-colors flex items-center';
+                };
+                
+                // 结束处理
+                recognition.onend = function() {
+                    console.log('语音识别结束');
+                    if (!voiceResult.classList.contains('hidden')) {
+                        return;
+                    }
+                    
+                    voiceStatusText.textContent = '语音识别超时，请重试';
+                    voiceStatusText.className = 'text-sm text-warning';
+                    
+                    // 恢复按钮状态
+                    voiceBtn.innerHTML = '<i class="fa fa-microphone mr-2"></i> 测试语音输入';
+                    voiceBtn.disabled = false;
+                    voiceBtn.className = 'px-4 py-2 bg-secondary text-dark rounded-lg hover:bg-secondary-dark transition-colors flex items-center';
+                };
+                
+                // 错误处理
+                recognition.onerror = function(event) {
+                    console.error('语音识别错误:', event.error);
+                    
+                    let errorMessage = '语音识别失败，请重试';
+                    switch (event.error) {
+                        case 'no-speech':
+                            errorMessage = '未检测到语音，请靠近麦克风并清晰说话';
+                            break;
+                        case 'audio-capture':
+                            errorMessage = '无法访问麦克风，请检查麦克风权限设置';
+                            break;
+                        case 'not-allowed':
+                            errorMessage = '麦克风权限被拒绝，请在浏览器设置中允许麦克风访问';
+                            break;
+                        case 'network':
+                            errorMessage = '网络连接错误，请检查网络连接';
+                            break;
+                    }
+                    
+                    voiceStatusText.textContent = errorMessage;
+                    voiceStatusText.className = 'text-sm text-error';
+                    
+                    // 恢复按钮状态
+                    voiceBtn.innerHTML = '<i class="fa fa-microphone mr-2"></i> 测试语音输入';
+                    voiceBtn.disabled = false;
+                    voiceBtn.className = 'px-4 py-2 bg-secondary text-dark rounded-lg hover:bg-secondary-dark transition-colors flex items-center';
+                };
+                
+                // 开始识别
+                recognition.start();
+                console.log('语音识别开始');
+            } catch (error) {
+                console.error('语音识别初始化错误:', error);
+                voiceStatusText.textContent = '语音识别初始化失败，请重试';
+                voiceStatusText.className = 'text-sm text-error';
+            }
+        });
+
+        // 添加用户消息
+        function addUserMessage(message) {
+            const chatContainer = document.getElementById('chat-container');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'chat-message user-message';
+            messageDiv.innerHTML = `<p>${message}</p>`;
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        // 添加AI消息
+        function addAIMessage(message) {
+            const chatContainer = document.getElementById('chat-container');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'chat-message ai-message';
+            messageDiv.innerHTML = `<p>${message}</p>`;
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        // 添加加载消息
+        function addLoadingMessage() {
+            const chatContainer = document.getElementById('chat-container');
+            const loadingDiv = document.createElement('div');
+            const loadingId = 'loading-' + Date.now();
+            loadingDiv.id = loadingId;
+            loadingDiv.className = 'chat-message ai-message loading-message';
+            loadingDiv.innerHTML = `
+                <div class="loading-dot"></div>
+                <div class="loading-dot"></div>
+                <div class="loading-dot"></div>
+            `;
+            chatContainer.appendChild(loadingDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            return loadingId;
+        }
+
+        // 移除加载消息
+        function removeLoadingMessage(id) {
+            const loadingDiv = document.getElementById(id);
+            if (loadingDiv) {
+                loadingDiv.remove();
+            }
+        }
+
+        // 页面加载完成后初始化测试
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('页面加载完成，开始初始化测试');
+            initializeTests();
+        });
+    </script>
+</body>
+</html>
